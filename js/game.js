@@ -1,6 +1,3 @@
-//USB test comment!
-
-
 "use strict";
 //forEach
 //map
@@ -35,7 +32,7 @@ var player = {
 			var attemptedTarget = inputList.slice(1, inputList.indexOf("with")).join(" ");
 			var desiredWeapon = inputList.slice((inputList.indexOf("with") + 1), inputList.length).join(" ");
 
-			this.primaryWeapon = searchArray(desiredWeapon, this.inventory);
+			this.primaryWeapon = getObjectFromArray(desiredWeapon, this.inventory);
 
 			if(desiredWeapon === "" || desiredWeapon === null){
 				printOut("You have to specify a weapon to attack with!");
@@ -79,9 +76,9 @@ var player = {
 		}
 
 		var currentRoomEntities = window[player.location].entities;
-		var target = searchArray(attemptedTarget, currentRoomEntities);
+		var target = getObjectFromArray(attemptedTarget, currentRoomEntities);
 
-		if(target.name && target.alive === true && attemptedTarget != undefined && this.primaryWeapon != null && this.primaryWeapon.attack_description != undefined && (desiredWeapon === undefined || searchArray(desiredWeapon, this.inventory) != "not found") ){
+		if(target.name && target.alive === true && attemptedTarget != undefined && this.primaryWeapon != null && this.primaryWeapon.attack_description != undefined && (desiredWeapon === undefined || getObjectFromArray(desiredWeapon, this.inventory) != "not found") ){
 			
 			playerTurnWasAnAction = true;
 
@@ -113,7 +110,7 @@ var player = {
 					
 				}
 			}
-		}else if((this.inventory.indexOf(searchArray(desiredWeapon, this.inventory)) != -1) && (this.primaryWeapon.damage === undefined || this.primaryWeapon.attack_description === undefined)){
+		}else if((this.inventory.indexOf(getObjectFromArray(desiredWeapon, this.inventory)) != -1) && (this.primaryWeapon.damage === undefined || this.primaryWeapon.attack_description === undefined)){
 			printOut("'" + desiredWeapon + "' isn't a weapon!");
 		}else if(attemptedTarget === undefined || attemptedTarget === ""){
 			printOut("You need to specify a target to attack!")
@@ -127,14 +124,14 @@ var player = {
 	},
 	eat: function(){ //Method for the player to eat an item from inventory
 		var target = inputList.slice(1, inputList.length).join(" ");
-		var food = searchArray(target, this.inventory);
+		var food = getObjectFromArray(target, this.inventory);
 
 		if(food.name != undefined && target != undefined && food.edible){
 
 			playerTurnWasAnAction = true;
 
 			printOut("You ate the " + target + "!");
-			this.HP += searchArray(food.name, this.inventory).nutrition;
+			this.HP += getObjectFromArray(food.name, this.inventory).nutrition;
 			this.inventory.splice(this.inventory.indexOf(food), 1);
 
 			if(this.HP > this.maxHP){
@@ -161,7 +158,7 @@ var player = {
 	},
 	drop: function(){
 		var target = inputList.slice(1, inputList.length).join(" ");
-		var item = searchArray(target, this.inventory);
+		var item = getObjectFromArray(target, this.inventory);
 
 		if(item.name != undefined && target != undefined){
 
@@ -188,7 +185,7 @@ var player = {
 			var target = inputList.slice(1, inputList.length).join(" ");
 		}
 		
-		var item = searchArray(target, window[player.location].entities);
+		var item = getObjectFromArray(target, window[player.location].entities);
 
 		if(item.name != undefined && target != undefined && item.takeable){
 
@@ -216,7 +213,7 @@ var player = {
 		}else{
 			var attemptedTarget = inputList.slice(1, inputList.length).join(" ");
 		}
-		target = searchArray(attemptedTarget, window[player.location].entities);
+		target = getObjectFromArray(attemptedTarget, window[player.location].entities);
 
 		if(target.alive && target.dialogue != undefined){
 

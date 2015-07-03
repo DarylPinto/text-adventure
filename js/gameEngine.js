@@ -30,30 +30,30 @@ function sprintf(str) {
 	});
 }
 
-function searchArray(item, array){//Search array for item with a name property, returns item
-	
-	var searchResult = null;
+function getObjectFromArray(needle, haystack){//Search array for object with a name property, returns object
+    
+    var searchResult = "not found";
 
-	for(var i = 0;i < array.length;i++){ 
+    for(var i = 0;i < haystack.length;i++){ 
 
-		var nameList = array[i].name.split(" "); //If user only types last word of item (e.g. 'berries' instead of 'poison berries') accept that answer
+        var nameList = haystack[i].name.split(" "); //If user only types last word of needle (e.g. 'berries' instead of 'poison berries') accept that answer
 
-		if(item === array[i].name || (item === "the " + array[i].name) || item === nameList[nameList.length - 1] || (item === "the " + nameList[nameList.length - 1]) ){
-			var searchResult = array[i];
-		}else if(array[i].synonyms != undefined){ //Check to see if object has any synonyms. If user types a synonym, return the object
-			for(var j = 0;j < array[i].synonyms.length;j++){
+        if(needle === haystack[i].name || (needle === "the " + haystack[i].name) || needle === nameList[nameList.length - 1] || (needle === "the " + nameList[nameList.length - 1]) ){
+            var searchResult = haystack[i];
+        }else if(haystack[i].synonyms != undefined){ //Check to see if object has any synonyms. If user types a synonym, return the object
+            for(var j = 0;j < haystack[i].synonyms.length;j++){
 
-				var synonymList = array[i].synonyms[j].split(" "); //If user only types last word of an item's synonym (e.g. 'girl' instead of 'little girl') accept that answer
+                var synonymList = haystack[i].synonyms[j].split(" "); //If user only types last word of an needle's synonym (e.g. 'girl' instead of 'little girl') accept that answer
 
-				if(item === array[i].synonyms[j] || item === "the " + array[i].synonyms[j] || item === synonymList[synonymList.length - 1] || item === "the " + synonymList[synonymList.length - 1] ){
-					var searchResult = array[i];
-				}	
+                if(needle === haystack[i].synonyms[j] || needle === "the " + haystack[i].synonyms[j] || needle === synonymList[synonymList.length - 1] || needle === "the " + synonymList[synonymList.length - 1] ){
+                    var searchResult = haystack[i];
+                }   
 
-			}
-		}
-	}
+            }
+        }
+    }
 
-	return searchResult;
+    return searchResult;
 }
 
 function processInput(){//Determines what to do with the command
