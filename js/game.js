@@ -11,7 +11,7 @@ var player = {
 	maxHP: 15,
 	damage: 1,
 	gold: 0,
-	location: "room42",
+	location: "testRoom",
 	inventory: [],
 	primaryWeapon: null,
 	look: function(){
