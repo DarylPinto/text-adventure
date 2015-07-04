@@ -1,4 +1,4 @@
-"use strict";
+//"use strict";
 //forEach
 //map
 //Filter
@@ -6,12 +6,13 @@
 //keys
 var playerTurnWasAnAction;
 
-var player = {
+var mainEntities = [
+player = {
 	HP: 15,
 	maxHP: 15,
 	damage: 1,
 	gold: 0,
-	location: "testRoom",
+	location: "room49",
 	inventory: [],
 	primaryWeapon: null,
 	look: function(){
@@ -331,6 +332,7 @@ var player = {
 		$("#command-line").css("display", "none");
 	}
 }
+]
 
 //========Computer Turn========
 
@@ -424,6 +426,37 @@ function Person(name, synonyms, HP, env_description, dialogue){
 }
 
 //========Game Locations========
+var overWorld = {
+	areas: [
+		{
+			title: "Southern Village",
+			location: [0,0,0],
+			description: "The sky is engulfed in smoke. You see fire blazing out of the windows of some houses in the distance.",
+			entities: [
+				new Weapon(
+					"wooden spear", //name
+					["family spear"], //synonyms
+					"You stab %s with your wooden spear!", //Attack description
+					"The family spear that has for so long hung on the wall in your house is lying on the ground, caked with dried blood.", //enviornment description
+					5 //damage
+				),
+				new Person( //name, generic_name, HP, env_description, dialogue
+					"cindy", //name
+					["little girl"], //synonyms
+					15, //hp
+					"A little girl with a look of pure horror stands alone staring at the destruction of the town. Tears are streaming down her face.", //enviornment description
+					"Cindy: The goblins... they c-came back again destroyed the town. They ran off w-with a nice lady too! Wahhh!!" //dialogue
+				)
+			]
+		},
+		{
+			title: "Northern Village",
+			location: [0,-1,0]
+		},
+	]
+}
+
+
 var testRoom = {
 	position: "x",
 	blockedExits: {
@@ -563,6 +596,9 @@ function startGameIndev(){
 
 	playerTurnWasAnAction = false;
 
+	//Initialize player location
+
+	mainEntities.splice(0, 1); //0 because player is first item in mainEntities array
 
 	player.look()
 	setTimeout(function(){
@@ -574,6 +610,3 @@ function startGameIndev(){
 }
 
 startGameIndev();
-
- 
-//Bugs: punch witch
