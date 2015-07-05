@@ -1,4 +1,4 @@
-//"use strict";
+"use strict";
 //forEach
 //map
 //Filter
@@ -6,8 +6,8 @@
 //keys
 var playerTurnWasAnAction;
 
-var mainEntities = [
-player = {
+var player = {
+	name: "player",
 	HP: 15,
 	maxHP: 15,
 	damage: 1,
@@ -16,7 +16,7 @@ player = {
 	inventory: [],
 	primaryWeapon: null,
 	look: function(){
-		var currentLocation = window[player.location];
+		var currentLocation = window[player.location]; 
 		
 		printOut(currentLocation.description);
 
@@ -332,7 +332,6 @@ player = {
 		$("#command-line").css("display", "none");
 	}
 }
-]
 
 //========Computer Turn========
 
@@ -451,7 +450,8 @@ var overWorld = {
 		},
 		{
 			title: "Northern Village",
-			location: [0,-1,0]
+			location: [0,-1,0],
+			entities: []
 		},
 	]
 }
@@ -597,15 +597,14 @@ function startGameIndev(){
 	playerTurnWasAnAction = false;
 
 	//Initialize player location
-
-	mainEntities.splice(0, 1); //0 because player is first item in mainEntities array
+	getAreaWithCoords(0,0,0).entities.push(mainEntities[mainEntities.indexOf(player)]); 
+	//mainEntities.splice(0, 1); //0 because player is first item in mainEntities array
 
 	player.look()
 	setTimeout(function(){
 		$("#command-line").css("margin-bottom", "0px");
 		$("#command-line").focus();
 	}, 500);
-
 
 }
 

@@ -35,11 +35,16 @@ function getAreaWithCoords(x,y,z){
     overWorld.areas.forEach(function(tile){
         if(tile.location != undefined){
             if(x === tile.location[0] && y === tile.location[1] && z === tile.location[2]){
-                var desiredArea = tile;
+                desiredArea = tile;
             }
         }
     });
     return desiredArea
+}
+
+
+function playerLocation(){
+    
 }
 
 function getObjectFromArray(needle, haystack){//Search array for object with a name property, returns object
