@@ -7,17 +7,17 @@
 var playerTurnWasAnAction;
 
 var player = {
-	name: "player",
 	HP: 15,
 	maxHP: 15,
 	damage: 1,
 	gold: 0,
-	location: "room49",
+	location: null,
 	inventory: [],
 	primaryWeapon: null,
 	look: function(){
-		var currentLocation = window[player.location]; 
+		var currentLocation = getAreaByLocation.apply(this, this.location);
 		
+		printOut("===== "+currentLocation.title+" =====")
 		printOut(currentLocation.description);
 
 		currentLocation.entities.forEach(function(entity){ //Scans current location for entities. If != false, display associated description
@@ -76,7 +76,7 @@ var player = {
 			}; 
 		}
 
-		var currentRoomEntities = window[player.location].entities;
+		var currentRoomEntities = getAreaByLocation.apply(this, this.location).entities;
 		var target = getObjectFromArray(attemptedTarget, currentRoomEntities);
 
 		if(target.name && target.alive === true && attemptedTarget != undefined && this.primaryWeapon != null && this.primaryWeapon.attack_description != undefined && (desiredWeapon === undefined || getObjectFromArray(desiredWeapon, this.inventory) != "not found") ){
@@ -167,7 +167,7 @@ var player = {
 
 			printOut("You dropped the " + target + "!");
 
-			window[player.location].entities.push(item);
+			getAreaByLocation.apply(this, this.location).entities.push(item);
 			this.inventory.splice(this.inventory.indexOf(item), 1);
 			
 
@@ -186,7 +186,7 @@ var player = {
 			var target = inputList.slice(1, inputList.length).join(" ");
 		}
 		
-		var item = getObjectFromArray(target, window[player.location].entities);
+		var item = getObjectFromArray(target, getAreaByLocation.apply(this, this.location).entities);
 
 		if(item.name != undefined && target != undefined && item.takeable){
 
@@ -195,7 +195,7 @@ var player = {
 			printOut(item.name + " added to inventory.");
 
 			this.inventory.push(item);
-			window[player.location].entities.splice(window[player.location].entities.indexOf(item), 1);
+			getAreaByLocation.apply(this, this.location).entities.splice(getAreaByLocation.apply(this, this.location).entities.indexOf(item), 1);
 			
 
 		}else if(target === undefined || target === ""){
@@ -214,7 +214,7 @@ var player = {
 		}else{
 			var attemptedTarget = inputList.slice(1, inputList.length).join(" ");
 		}
-		target = getObjectFromArray(attemptedTarget, window[player.location].entities);
+		target = getObjectFromArray(attemptedTarget, getAreaByLocation.apply(this, this.location).entities);
 
 		if(target.alive && target.dialogue != undefined){
 
@@ -227,16 +227,93 @@ var player = {
 			printOut("Talk error");
 		}
 	},
-	move: function(){ //Method for the player to move around the map
+	move: function(){
+		if(inputList[0] === "go" || inputList[0] === "move"){
+			var direction = inputList.slice(1, inputList.length).join(" ");
+		}else{
+			var direction = inputList.slice(0, inputList.length).join(" ");
+		}
+
+		if(direction === "north" || direction === "n"){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.north === undefined){
+
+				playerTurnWasAnAction = true;
+
+				if(getAreaByLocation(player.location[0],player.location[1],(player.location[2] + 1),player.location[3]) === null){ //Check to see if desired destination is not defined
+					printOut("This area is out of bounds!")
+				}else{
+					this.location[2] += 1; //increase player's y co-ordinate by 1
+					this.look();
+				}	
+
+			}else{
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.north); //If desired location is blocked, display error message written for that direction
+			}
+		}else if(direction === "south" || direction === "s"){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.south === undefined){
+
+				playerTurnWasAnAction = true;
+
+				if(getAreaByLocation(player.location[0],player.location[1],(player.location[2] - 1),player.location[3]) === null){ //Check to see if desired destination is not defined
+					printOut("This area is out of bounds!")
+				}else{
+					this.location[2] -= 1; //decrease player's y co-ordinate by 1
+					this.look();
+				}	
+
+			}else{
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.south); //If desired location is blocked, display error message written for that direction
+			}
+		}else if(direction === "east" || direction === "e"){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.east === undefined){
+
+				playerTurnWasAnAction = true;
+
+
+				if(getAreaByLocation(player.location[0],(player.location[1] + 1),player.location[2],player.location[3]) === null){
+					printOut("This area is out of bounds!")
+				}else{
+					this.location[1] += 1; //increase player's x co-ordinate by 1
+					this.look();
+				}	
+
+			}else{
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.east); //If desired location is blocked, display error message written for that direction
+			}
+		}else if(direction === "west" || direction === "w"){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.west === undefined){
+
+				playerTurnWasAnAction = true;
+
+
+				if(getAreaByLocation(player.location[0],(player.location[1] - 1),player.location[2],player.location[3]) === null){
+					printOut("This area is out of bounds!")
+				}else{
+					this.location[1] -= 1; //decrease player's x co-ordinate by 1
+					this.look();
+				}	
+
+			}else{
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.west); //If desired location is blocked, display error message written for that direction
+			}
+		}else{
+			printOut("'" + direction + "' is not a valid direction!");
+		}
+	},
+	moveLegacy: function(){ //Method for the player to move around the map
 
 		var mapSize = 7; //Amount of tiles in the map is this value squared
+		var player_map = player.location[0];
+		var player_x = player.location[1];
+		var player_y = player.location[2];
+		var player_z = player.location[3];
 
-		if(inputList[0] === "exit" && window[player.location].defaultExit != undefined){ //If room has a defaultExit property, player typing exit sends them in that direction
-			var direction = window[player.location].defaultExit;
+		if(inputList[0] === "exit" && getAreaByLocation.apply(this, this.location).defaultExit != undefined){ //If room has a defaultExit property, player typing exit sends them in that direction
+			var direction = getAreaByLocation.apply(this, this.location).defaultExit;
 		}else if(inputList[0] === "go" || inputList[0] === "move"){
 
 			if(inputList[1] === "outside"){
-				var direction = window[player.location].defaultExit;
+				var direction = getAreaByLocation.apply(this, this.location).defaultExit;
 			}else{
 				var direction = inputList.slice(1, inputList.length).join(" ");
 			}
@@ -245,27 +322,25 @@ var player = {
 			var direction = inputList.slice(0, inputList.length).join(" ");
 		}
 
-		var currentLocation = window[player.location].position;
+		var currentLocation = getAreaByLocation.apply(this, this.location).position;
 
 		if(direction === "north" || direction === "n"){
-			if(window[player.location].blockedExits.north === undefined){ //If desired location is not blocked, move in that direction
+			if(getAreaByLocation.apply(this, this.location).blockedExits.north === undefined){ //If desired location is not blocked, move in that direction
 
 				playerTurnWasAnAction = true;
-
-				var destination = currentLocation -= mapSize;
 
 				if(destination < 1){ //Map boundry check
 					printOut("You can't go in that direction!")
 				}else{ //Move player
-					this.location = "room" + destination.toString();
+					this.location[2] -= 1;
 					this.look();
 				}	
 			}else{
-				printOut(window[player.location].blockedExits.north); //If desired location is blocked, display error message written for that direction
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.north); //If desired location is blocked, display error message written for that direction
 			}
 
 		}else if(direction === "west" || direction === "w"){
-			if(window[player.location].blockedExits.west === undefined){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.west === undefined){
 
 				playerTurnWasAnAction = true;
 
@@ -278,10 +353,10 @@ var player = {
 					this.look();
 				}
 			}else{
-				printOut(window[player.location].blockedExits.west);
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.west);
 			}
 		}else if(direction === "east" || direction === "e"){
-			if(window[player.location].blockedExits.east === undefined){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.east === undefined){
 
 				playerTurnWasAnAction = true;
 
@@ -294,10 +369,10 @@ var player = {
 					this.look();
 				}
 			}else{
-				printOut(window[player.location].blockedExits.east);
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.east);
 			}
 		}else if(direction === "south" || direction === "s"){
-			if(window[player.location].blockedExits.south === undefined){
+			if(getAreaByLocation.apply(this, this.location).blockedExits.south === undefined){
 
 				playerTurnWasAnAction = true;
 
@@ -310,14 +385,14 @@ var player = {
 					this.look();
 				}
 			}else{
-				printOut(window[player.location].blockedExits.south);
+				printOut(getAreaByLocation.apply(this, this.location).blockedExits.south);
 			}
 		}else{
 			printOut("'" + direction + "' is not a valid direction!");
 		}
 	},
 	getHelp: function(){
-		printOut(window[player.location].availableCommands);
+		printOut(getAreaByLocation.apply(this, this.location).availableCommands);
 	},
 	viewInv: function(){ //Method for the player to view inventory
 		printOut("Inventory:");
@@ -339,9 +414,9 @@ function computerTurn(){
 
 	if(playerTurnWasAnAction){ //Prevents computer from doing something when player move is not an action (A goblin won't attack you for checking your inventory)
 
-		for(var i = 0;i < window[player.location].entities.length;i++){ //If any entities are aggro, attack the player
-			if(window[player.location].entities[i].aggro === true && window[player.location].entities[i].alive === true && player.HP > 0){
-					window[player.location].entities[i].attack();
+		for(var i = 0;i < getAreaByLocation.apply(this, player.location).entities.length;i++){ //If any entities are aggro, attack the player
+			if(getAreaByLocation.apply(this, player.location).entities[i].aggro === true && getAreaByLocation.apply(this, player.location).entities[i].alive === true && player.HP > 0){
+					getAreaByLocation.apply(this, player.location).entities[i].attack();
 			}
 		}
 
@@ -426,39 +501,90 @@ function Person(name, synonyms, HP, env_description, dialogue){
 
 //========Game Locations========
 var overWorld = {
-	areas: [
+	maps: [
 		{
-			title: "Southern Village",
-			location: [0,0,0],
-			description: "The sky is engulfed in smoke. You see fire blazing out of the windows of some houses in the distance.",
-			entities: [
-				new Weapon(
-					"wooden spear", //name
-					["family spear"], //synonyms
-					"You stab %s with your wooden spear!", //Attack description
-					"The family spear that has for so long hung on the wall in your house is lying on the ground, caked with dried blood.", //enviornment description
-					5 //damage
-				),
-				new Person( //name, generic_name, HP, env_description, dialogue
-					"cindy", //name
-					["little girl"], //synonyms
-					15, //hp
-					"A little girl with a look of pure horror stands alone staring at the destruction of the town. Tears are streaming down her face.", //enviornment description
-					"Cindy: The goblins... they c-came back again destroyed the town. They ran off w-with a nice lady too! Wahhh!!" //dialogue
-				)
+			title: "overWorld",
+			tiles: [
+				{
+					title: "Eldirsh Village - South Side",
+					coords: [0,0,0],
+					blockedExits: {},
+					entities: [],
+					maps: [
+						{
+							title: "House",
+							tiles: [
+								{
+									title: "Entrance of the House",
+									coords: [0,0,0],
+									blockedExits: {},
+									description: "The house is dark and quiet...",
+									entities: []
+								},
+								{
+									title: "Kitchen",
+									coords: [1,0,0],
+									blockedExits: {},
+									description: "The fridge is glowing an eerie green.",
+									entities: []
+								}
+							]
+						},
+						{
+							title: "House",
+							tiles: [
+								{
+									title: "Neighbor's Foyer",
+									coords: [0,0,0],
+									blockedExits: {},
+									description: "The house is dark and quiet...",
+									entities: []
+								},
+								{
+									title: "Neighbor's Study",
+									coords: [0,-1,0],
+									blockedExits: {},
+									description: "The fridge is glowing an eerie green.",
+									entities: []
+								}
+							]
+						}
+					]
+				},
+				{
+					title: "Eldirsh Village - North Side",
+					coords: [0,1,0],
+					blockedExits: {
+						north: "A large barbed wire fence bordering the town blocks the way.",
+						east: "A large barbed wire fence bordering the town blocks the way."
+					},
+					description: "The sky is engulfed in smoke. You see fire blazing out of the windows of some houses in the distance.",
+					entities: [
+						new Weapon(
+							"wooden spear", //name
+							["family spear"], //synonyms
+							"You stab %s with your wooden spear!", //Attack description
+							"The family spear that has for so long hung on the wall in your house is lying on the ground, caked with dried blood.", //enviornment description
+							5 //damage
+						),
+						new Person( //name, generic_name, HP, env_description, dialogue
+							"cindy", //name
+							["little girl"], //synonyms
+							15, //hp
+							"A little girl with a look of pure horror stands alone staring at the destruction of the town. Tears are streaming down her face.", //enviornment description
+							"Cindy: The goblins... they c-came back again destroyed the town. They ran off w-with a nice lady too! Wahhh!!" //dialogue
+						)
+					]
+				}
 			]
-		},
-		{
-			title: "Northern Village",
-			location: [0,-1,0],
-			entities: []
-		},
+		}
 	]
 }
 
 
 var testRoom = {
-	position: "x",
+	title: "Test Room",
+	coords: [99,99,99],
 	blockedExits: {
 		north: "This is a test room, so there are no exits.",
 		west: "This is a test room, so there are no exits.",
@@ -541,7 +667,7 @@ var room49 = {
 function startGame(){
 
 	playerTurnWasAnAction = false;
-	player.location = "room49";
+	player.location = [overWorld, 0, 0, 0];
 
 	setTimeout(function(){
 		printOut("\"Mama...\"");
@@ -595,17 +721,16 @@ function startGame(){
 function startGameIndev(){
 
 	playerTurnWasAnAction = false;
-
-	//Initialize player location
-	getAreaWithCoords(0,0,0).entities.push(mainEntities[mainEntities.indexOf(player)]); 
-	//mainEntities.splice(0, 1); //0 because player is first item in mainEntities array
+	player.location = [overWorld, 0, 0, 0];
 
 	player.look()
 	setTimeout(function(){
-		$("#command-line").css("margin-bottom", "0px");
+		$(".command-wrapper").css("margin-bottom", "0px");
 		$("#command-line").focus();
 	}, 500);
 
 }
 
 startGameIndev();
+
+//TODO: Fix getAreaByLocation to work with new map layouts

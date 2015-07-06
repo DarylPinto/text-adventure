@@ -27,23 +27,62 @@ body{
 	margin-top: 0;
 }
 
+.command-wrapper{
+	height: 50px;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	margin-bottom: -50px;
+	transition: .5s;
+}
+
+.input-arrow{
+	width: 44px;
+	height: 100%;
+	font-size: 22px;
+	box-sizing: border-box;
+	padding-left: 20px;
+	line-height: 50px;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 3;
+	float: left;
+}
+
+.send{
+	width: 40px;
+	height: 100%;
+	border: 0;
+	background-color: #0D0D0D;
+	font-size: 15px;
+	cursor: pointer;
+	box-sizing: border-box;
+	color: #57B63C;
+	font-family: 'Monaco', 'Consolas', 'Lucida Console', monospace;
+	padding-left: 12px;
+	line-height: 50px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 3;
+	float: right;
+}
+
 #command-line{
 	background-color: #121315;
 	font-family: 'Monaco', 'Consolas', 'Lucida Console', monospace;
 	color: #57B63C;
-	height: 50px;
+	height: 100%;
 	width: 100%;
-	position: fixed;
 	font-size: 22px;
-	bottom: 0;
-	left: 0;
 	outline: none;
 	border: none;
-	padding-left: 20px;
+	padding-left: 44px;
 	box-sizing: border-box;
 	display: block;
-	margin-bottom: -50px;
-	transition: .5s;
+	float: left;
 }
 
 #command-line:active{

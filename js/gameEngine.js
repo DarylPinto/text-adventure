@@ -30,21 +30,17 @@ function sprintf(str) {
 	});
 }
 
-function getAreaWithCoords(x,y,z){
+function getAreaByLocation(map,x,y,z){ //Pass in an array: [map,x,y,z], returns area in that location
     var desiredArea = null;
-    overWorld.areas.forEach(function(tile){
-        if(tile.location != undefined){
-            if(x === tile.location[0] && y === tile.location[1] && z === tile.location[2]){
+
+    region.maps[0].tiles.forEach(function(tile){
+        if(tile.coords != undefined){
+            if(x === tile.coords[0] && y === tile.coords[1] && z === tile.coords[2]){
                 desiredArea = tile;
             }
         }
     });
     return desiredArea
-}
-
-
-function playerLocation(){
-    
 }
 
 function getObjectFromArray(needle, haystack){//Search array for object with a name property, returns object
@@ -132,9 +128,7 @@ function processInput(){//Determines what to do with the command
 
         default: printOut("'" + originalPlayerInput + "' is not a valid command.");
     }
-}
-
-
+};
 
 $(document).keydown(function(e) { //Enter Key submits whatever is in the command-line
     switch(e.which) {

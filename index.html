@@ -7,7 +7,17 @@
 </head>
 <body>
     <div id="main-area"></div>
-    <input id="command-line"></input>
+    <div class="command-wrapper">
+    	<div class="input-arrow">></div>
+    	<input id="command-line"></input>
+    	<div class="send" onclick="
+    		submitCommand();
+    		processInput();
+    		setTimeout(function(){
+    			computerTurn();
+    		}, 1000);
+    	">GO</div>
+    </div>
 <script type="text/javascript" src="js/gameEngine.js"></script>
 <script type="text/javascript" src="js/game.js"></script>
 </body>
